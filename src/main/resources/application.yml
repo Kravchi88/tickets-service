@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: tickets-service
+
+server:
+  port: 8080
