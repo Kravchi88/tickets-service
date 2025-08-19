@@ -1,10 +1,8 @@
 package com.kravchi88.tickets.user.application;
 
-import com.kravchi88.tickets.common.error.LoginAlreadyExistsException;
 import com.kravchi88.tickets.user.application.dto.UserRegisterData;
 import com.kravchi88.tickets.user.model.User;
 import com.kravchi88.tickets.user.repository.UserRepository;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +23,7 @@ public class UserServiceImpl implements UserService {
         String fullName = data.fullName();
         User userToSave = new User(null, login, passwordHash, fullName);
 
-        try {
-            long id = repository.insert(userToSave);
-            return new User(id, userToSave.login(), userToSave.passwordHash(), userToSave.fullName());
-        } catch (DuplicateKeyException e) {
-            throw new LoginAlreadyExistsException(login);
-        }
+        long id = repository.insert(userToSave);
+        return new User(id, userToSave.login(), userToSave.passwordHash(), userToSave.fullName());
     }
 }

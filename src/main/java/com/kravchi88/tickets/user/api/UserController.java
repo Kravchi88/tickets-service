@@ -3,7 +3,6 @@ package com.kravchi88.tickets.user.api;
 import com.kravchi88.tickets.user.api.mapper.UserWebMapper;
 import com.kravchi88.tickets.user.api.dto.UserRegisterRequest;
 import com.kravchi88.tickets.user.api.dto.UserResponse;
-import com.kravchi88.tickets.user.application.dto.UserRegisterData;
 import com.kravchi88.tickets.user.application.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,7 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRegisterRequest request) {
-        UserRegisterData data = mapper.toRegisterData(request);
+        var data = mapper.toRegisterData(request);
         UserResponse created = mapper.toResponse(service.register(data));
         URI location = URI.create("/api/users/" + created.id());
         return ResponseEntity.created(location).body(created);
