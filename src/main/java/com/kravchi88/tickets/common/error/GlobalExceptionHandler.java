@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -41,11 +42,31 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        Map<String, List<String>> issues = new LinkedHashMap<>();
+        String param = e.getName();
+        String message = "Invalid value for parameter '" + param + "'";
+        issues.put("params", List.of(message));
+
+        ErrorResponse body = new ErrorResponse("VALIDATION_ERROR", "Invalid input data", issues);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException e) {
+        Map<String, List<String>> issues = new LinkedHashMap<>();
+        issues.put("params", List.of(e.getMessage()));
+
+        ErrorResponse body = new ErrorResponse("VALIDATION_ERROR", "Invalid input data", issues);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
 
     @ExceptionHandler(LoginAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateLogin(LoginAlreadyExistsException e) {
         Map<String, List<String>> issues = new LinkedHashMap<>();
         issues.put("login", List.of(e.getMessage()));
+
         ErrorResponse body = new ErrorResponse("CONFLICT", "Duplicate login", issues);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
