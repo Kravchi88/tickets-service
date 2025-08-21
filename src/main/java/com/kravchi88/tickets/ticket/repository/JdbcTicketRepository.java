@@ -22,8 +22,7 @@ public class JdbcTicketRepository implements TicketRepository {
         this.ticketRowMapper = ticketRowMapper;
     }
 
-    private static final String SQL_FIND_AVAILABLE =
-            """
+    private static final String SQL_FIND_AVAILABLE = """
             SELECT
              t.id,
              r.origin,
@@ -46,6 +45,11 @@ public class JdbcTicketRepository implements TicketRepository {
             LIMIT :limit OFFSET :offset
             """;
 
+    private static final String SQL_MARK_SOLD = """
+            UPDATE ticket SET is_sold = TRUE
+            WHERE id = :ticketId AND is_sold = FALSE
+            """;
+
     @Override
     public Slice<Ticket> findAvailable(TicketSearchParams params) {
         int limitPlusOne = params.size() + 1;
@@ -66,5 +70,12 @@ public class JdbcTicketRepository implements TicketRepository {
         List<Ticket> items = hasNext ? rows.subList(0, params.size()) : rows;
 
         return new Slice<>(items, hasNext);
+    }
+
+    @Override
+    public void markTicketSold(long ticketId) {
+        SqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("ticketId", ticketId, Types.BIGINT);
+        jdbc.update(SQL_MARK_SOLD, parameterSource);
     }
 }

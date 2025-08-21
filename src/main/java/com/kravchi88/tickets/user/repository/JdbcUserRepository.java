@@ -1,6 +1,6 @@
 package com.kravchi88.tickets.user.repository;
 
-import com.kravchi88.tickets.common.error.LoginAlreadyExistsException;
+import com.kravchi88.tickets.common.error.exception.LoginAlreadyExistsException;
 import com.kravchi88.tickets.user.model.User;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -6,4 +6,5 @@ import com.kravchi88.tickets.ticket.model.Ticket;
 
 public interface TicketRepository {
     Slice<Ticket> findAvailable(TicketSearchParams params);
+    void markTicketSold(long ticketId);
 }

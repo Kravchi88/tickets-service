@@ -1,11 +1,9 @@
 package com.kravchi88.tickets.ticket.api;
 
-import com.kravchi88.tickets.common.page.PageData;
 import com.kravchi88.tickets.common.page.PageResponse;
 import com.kravchi88.tickets.ticket.api.dto.TicketResponse;
 import com.kravchi88.tickets.ticket.api.mapper.TicketWebMapper;
 import com.kravchi88.tickets.ticket.application.TicketService;
-import com.kravchi88.tickets.ticket.model.Ticket;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -49,7 +47,7 @@ public class TicketController {
             throw new IllegalArgumentException("Invalid date filter. fromTime must be before or equal to toTime");
         }
 
-        PageData<Ticket> data = service.
+        var data = service.
                 searchAvailableTickets(mapper.toSearchParams(origin, destination, carrier, fromTime, toTime, page, size));
         PageResponse<TicketResponse> body = mapper.toResponsePage(data);
         return ResponseEntity.ok(body);
