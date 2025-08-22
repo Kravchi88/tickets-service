@@ -34,8 +34,7 @@ public class TicketWebMapper {
     public TicketSearchParams toSearchParams(
             String origin, String destination, String carrier,
             OffsetDateTime fromTime, OffsetDateTime toTime,
-            Integer page, Integer size
-    ) {
+            int page, int size) {
 
         String originLike = (origin == null || origin.isBlank()) ? null : origin.trim();
         String destinationLike = (destination == null || destination.isBlank()) ? null : destination.trim();

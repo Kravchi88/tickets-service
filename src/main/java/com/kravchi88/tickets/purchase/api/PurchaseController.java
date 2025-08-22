@@ -1,15 +1,19 @@
 package com.kravchi88.tickets.purchase.api;
 
+import com.kravchi88.tickets.common.page.PageResponse;
 import com.kravchi88.tickets.purchase.api.dto.PurchasedTicketResponse;
 import com.kravchi88.tickets.purchase.api.mapper.PurchaseWebMapper;
 import com.kravchi88.tickets.purchase.application.PurchaseService;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -34,5 +38,15 @@ public class PurchaseController {
         PurchasedTicketResponse body = mapper.toPurchasedResponse(purchasedTicket);
         URI location = URI.create("/api/purchases/" + body.purchaseId());
         return ResponseEntity.created(location).body(body);
+    }
+
+    @GetMapping("/purchases")
+    public ResponseEntity<PageResponse<PurchasedTicketResponse>> getPurchasedTickets(
+            @Min(1) @RequestHeader("X-User-Id") long userId,
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @Max(50) @RequestParam(defaultValue = "10") Integer size) {
+        var data = service.getPurchasedTickets(mapper.toSearchParams(userId, page, size));
+       PageResponse<PurchasedTicketResponse> body = mapper.toResponsePage(data);
+        return ResponseEntity.ok(body);
     }
 }

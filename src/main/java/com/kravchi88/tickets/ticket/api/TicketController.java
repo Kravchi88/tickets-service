@@ -40,9 +40,9 @@ public class TicketController {
             @RequestParam(required = false)
             @FutureOrPresent
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime toTime,
-            @Min(0)  @RequestParam(defaultValue = "0") Integer page,
-            @Min(1) @Max(50) @RequestParam(defaultValue = "10") Integer size
-    ) {
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @Max(50) @RequestParam(defaultValue = "10") Integer size) {
+
         if (fromTime != null && toTime != null && fromTime.isAfter(toTime)) {
             throw new IllegalArgumentException("Invalid date filter. fromTime must be before or equal to toTime");
         }
