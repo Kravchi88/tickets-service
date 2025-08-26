@@ -1,5 +1,7 @@
 package com.kravchi88.tickets.common.error;
 
+import com.kravchi88.tickets.common.error.exception.InvalidCredentialsException;
+import com.kravchi88.tickets.common.error.exception.InvalidRefreshTokenException;
 import com.kravchi88.tickets.common.error.exception.LoginAlreadyExistsException;
 import com.kravchi88.tickets.common.error.exception.TicketAlreadyPurchasedException;
 import com.kravchi88.tickets.common.error.exception.TicketNotFoundException;
@@ -101,5 +103,23 @@ public class GlobalExceptionHandler {
 
         ErrorResponse body = new ErrorResponse("NOT FOUND", "User not found", issues);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException e) {
+        Map<String, List<String>> issues = new LinkedHashMap<>();
+        issues.put("authentication", List.of(e.getMessage()));
+
+        ErrorResponse body = new ErrorResponse("UNAUTHORIZED", "Authentication required", issues);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRefreshToken(InvalidRefreshTokenException e) {
+        Map<String, List<String>> issues = new LinkedHashMap<>();
+        issues.put("token", List.of(e.getMessage()));
+
+        ErrorResponse body = new ErrorResponse("UNAUTHORIZED", "Authentication required", issues);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 }

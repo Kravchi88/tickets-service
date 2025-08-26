@@ -3,23 +3,23 @@ package com.kravchi88.tickets.user.application;
 import com.kravchi88.tickets.user.application.dto.UserRegisterData;
 import com.kravchi88.tickets.user.model.User;
 import com.kravchi88.tickets.user.repository.UserRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
-    private final BCryptPasswordEncoder encoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository repository, BCryptPasswordEncoder encoder) {
+    public UserServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
-        this.encoder = encoder;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public User register(UserRegisterData data) {
         String login = data.login();
-        String passwordHash = encoder.encode(data.password());
+        String passwordHash = passwordEncoder.encode(data.password());
         String fullName = data.fullName();
         User userToSave = new User(null, login, passwordHash, fullName);
 

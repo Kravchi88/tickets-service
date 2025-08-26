@@ -4,3 +4,10 @@ spring:
 
 server:
   port: 8080
+
+app:
+  jwt:
+    issuer: "tickets-service"
+    secret: ${JWT_SECRET}
+    access-ttl-minutes: 15
+    refresh-ttl-days: 7
