@@ -4,6 +4,8 @@ import com.kravchi88.tickets.common.page.PageResponse;
 import com.kravchi88.tickets.ticket.api.dto.TicketResponse;
 import com.kravchi88.tickets.ticket.api.mapper.TicketWebMapper;
 import com.kravchi88.tickets.ticket.application.TicketService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -20,6 +22,7 @@ import java.time.OffsetDateTime;
 @Validated
 @RestController
 @RequestMapping("/api/tickets")
+@Tag(name = "Tickets", description = "Поиск доступных билетов")
 public class TicketController {
     private final TicketService service;
     private final TicketWebMapper mapper;
@@ -30,6 +33,7 @@ public class TicketController {
     }
 
     @GetMapping("/available")
+    @Operation(summary = "Доступные билеты", description = "Поиск доступных для покупки билетов с фильтрами и пагинацией")
     public ResponseEntity<PageResponse<TicketResponse>> searchAvailableTickets(
             @RequestParam(required = false) String origin,
             @RequestParam(required = false) String destination,
