@@ -10,6 +10,29 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d tickets"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: tickets-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tickets
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      APP_JWT_ISSUER: tickets-service
+      APP_JWT_SECRET: ${JWT_SECRET}
+      APP_JWT_ACCESS_TTL_MINUTES: 30
+      APP_JWT_REFRESH_TTL_DAYS: 7
+    ports:
+      - "8080:8080"
     restart: unless-stopped
 
 volumes:
