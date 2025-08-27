@@ -5,6 +5,7 @@ import com.kravchi88.tickets.common.error.ErrorResponse;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class SecurityErrorWriter {
@@ -18,9 +19,20 @@ public class SecurityErrorWriter {
         var body = new ErrorResponse(
                 "UNAUTHORIZED",
                 "Authentication required",
-                Map.of("authentication", java.util.List.of("Missing or invalid access token"))
+                Map.of("authentication", List.of("Missing or invalid access token"))
         );
         response.setStatus(401);
+        response.setContentType("application/json");
+        mapper.writeValue(response.getWriter(), body);
+    }
+
+    public void writeForbidden(HttpServletResponse response) throws IOException {
+        var body = new ErrorResponse(
+                "FORBIDDEN",
+                "Access denied",
+                Map.of("authentication", List.of("Insufficient permissions"))
+        );
+        response.setStatus(403);
         response.setContentType("application/json");
         mapper.writeValue(response.getWriter(), body);
     }

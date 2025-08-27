@@ -1,6 +1,7 @@
 package com.kravchi88.tickets.user.repository.mapper;
 
 import com.kravchi88.tickets.user.model.User;
+import com.kravchi88.tickets.user.model.UserRole;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,8 @@ public class UserRowMapper implements RowMapper<User> {
                 rs.getLong("id"),
                 rs.getString("login"),
                 rs.getString("password_hash"),
-                rs.getString("full_name")
+                rs.getString("full_name"),
+                UserRole.valueOf(rs.getString("role"))
         );
     }
 }

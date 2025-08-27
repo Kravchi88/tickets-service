@@ -36,7 +36,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         boolean passwordOk = passwordEncoder.matches(credentials.password(), user.passwordHash());
         if (!passwordOk) throw new InvalidCredentialsException();
 
-        var principal = new UserPrincipal(user.id(), user.login(), List.of());
+        var principal = new UserPrincipal(user.id(), user.login(), List.of(user.role().name()));
 
         String accessToken  = tokenProvider.generateAccessToken(principal);
         String refreshToken = tokenProvider.generateRefreshToken(principal);
@@ -56,7 +56,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             long userId = Long.parseLong(claims.getSubject());
             User user = userRepository.findById(userId).orElseThrow(InvalidRefreshTokenException::new);
 
-            var principal = new UserPrincipal(user.id(), user.login(), List.of());
+            var principal = new UserPrincipal(user.id(), user.login(), List.of(user.role().name()));
             String newAccessToken = tokenProvider.generateAccessToken(principal);
 
             return new TokenPair(newAccessToken, refreshToken);

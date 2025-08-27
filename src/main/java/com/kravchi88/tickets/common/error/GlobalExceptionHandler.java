@@ -1,11 +1,11 @@
 package com.kravchi88.tickets.common.error;
 
+import com.kravchi88.tickets.common.error.exception.DuplicateValueException;
 import com.kravchi88.tickets.common.error.exception.InvalidCredentialsException;
 import com.kravchi88.tickets.common.error.exception.InvalidRefreshTokenException;
 import com.kravchi88.tickets.common.error.exception.LoginAlreadyExistsException;
+import com.kravchi88.tickets.common.error.exception.NotFoundException;
 import com.kravchi88.tickets.common.error.exception.TicketAlreadyPurchasedException;
-import com.kravchi88.tickets.common.error.exception.TicketNotFoundException;
-import com.kravchi88.tickets.common.error.exception.UserNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,6 +78,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
+    @ExceptionHandler(DuplicateValueException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateValue(DuplicateValueException e) {
+        Map<String, List<String>> issues = new LinkedHashMap<>();
+        issues.put("value", List.of(e.getMessage()));
+
+        ErrorResponse body = new ErrorResponse("CONFLICT", "Duplicate value", issues);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
     @ExceptionHandler(TicketAlreadyPurchasedException.class)
     public ResponseEntity<ErrorResponse> handleTicketAlreadyPurchased(TicketAlreadyPurchasedException e) {
         Map<String, List<String>> issues = new LinkedHashMap<>();
@@ -87,21 +96,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
-    @ExceptionHandler(TicketNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleTicketNotFound(TicketNotFoundException e) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException e) {
         Map<String, List<String>> issues = new LinkedHashMap<>();
-        issues.put("ticket", List.of(e.getMessage()));
+        issues.put("entity", List.of(e.getMessage()));
 
-        ErrorResponse body = new ErrorResponse("NOT FOUND", "Ticket not found", issues);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException e) {
-        Map<String, List<String>> issues = new LinkedHashMap<>();
-        issues.put("user", List.of(e.getMessage()));
-
-        ErrorResponse body = new ErrorResponse("NOT FOUND", "User not found", issues);
+        ErrorResponse body = new ErrorResponse("NOT FOUND", "Entity not found", issues);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 

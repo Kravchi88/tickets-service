@@ -6,6 +6,13 @@ TRUNCATE TABLE
     carrier
     RESTART IDENTITY CASCADE;
 
+
+--Adm1nPassw0rd
+INSERT INTO app_user (login, password_hash, full_name, role)
+VALUES ('admin', '$2a$10$kiDp8fJaYIU2Eu5tDXJowu218BQFyXT9IVG2f04mBsIiCl7Rjntcq', 'System Admin', 'ROLE_ADMIN');
+
+
+
 INSERT INTO carrier (carrier_name, phone) VALUES
     ('Turkish Airlines', '+90 212 463 63 63'),
     ('Emirates',          '+971 600 555555'),

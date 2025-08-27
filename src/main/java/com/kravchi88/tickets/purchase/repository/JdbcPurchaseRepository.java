@@ -1,8 +1,7 @@
 package com.kravchi88.tickets.purchase.repository;
 
+import com.kravchi88.tickets.common.error.exception.NotFoundException;
 import com.kravchi88.tickets.common.error.exception.TicketAlreadyPurchasedException;
-import com.kravchi88.tickets.common.error.exception.TicketNotFoundException;
-import com.kravchi88.tickets.common.error.exception.UserNotFoundException;
 import com.kravchi88.tickets.common.page.Slice;
 import com.kravchi88.tickets.purchase.application.dto.PurchaseSearchParams;
 import com.kravchi88.tickets.purchase.model.PurchasedTicket;
@@ -91,11 +90,11 @@ public class JdbcPurchaseRepository implements PurchaseRepository {
             Long id = jdbc.queryForObject(SQL_INSERT_PURCHASE, parameterSource, Long.class);
             return Objects.requireNonNull(id, "INSERT returned no id");
         } catch (EmptyResultDataAccessException e) {
-            throw new TicketNotFoundException(ticketId);
+            throw new NotFoundException("Ticket", ticketId);
         } catch (DuplicateKeyException e) {
             throw new TicketAlreadyPurchasedException(ticketId);
         } catch (DataIntegrityViolationException e) {
-            throw new UserNotFoundException(userId);
+            throw new NotFoundException("User", userId);
         }
     }
 

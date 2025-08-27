@@ -4,5 +4,6 @@ public record User(
         Long id,
         String login,
         String passwordHash,
-        String fullName
+        String fullName,
+        UserRole role
 ) {}

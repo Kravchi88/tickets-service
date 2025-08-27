@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -35,11 +36,13 @@ public class SecurityConfig {
                                  "/api/tickets/available",
                                  "/api/users/register")
                         .permitAll()
-                        .anyRequest()
-                        .authenticated()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedEntryPoint(objectMapper)));
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(unauthorizedEntryPoint(objectMapper))
+                        .accessDeniedHandler(accessDeniedHandler(objectMapper)));
 
         return httpSecurity.build();
     }
@@ -48,5 +51,11 @@ public class SecurityConfig {
     AuthenticationEntryPoint unauthorizedEntryPoint(ObjectMapper objectMapper) {
         var writer = new SecurityErrorWriter(objectMapper);
         return (request, response, exception) -> writer.writeUnauthorized(response);
+    }
+
+    @Bean
+    AccessDeniedHandler accessDeniedHandler(ObjectMapper objectMapper) {
+        var writer = new SecurityErrorWriter(objectMapper);
+        return (request, response, exception) -> writer.writeForbidden(response);
     }
 }

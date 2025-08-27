@@ -25,19 +25,19 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     private static final String SQL_INSERT = """
-        INSERT INTO app_user (login, password_hash, full_name)
-        VALUES (:login, :passwordHash, :fullName)
+        INSERT INTO app_user (login, password_hash, full_name, role)
+        VALUES (:login, :passwordHash, :fullName, :role)
         RETURNING id
         """;
 
     private static final String SQL_FIND_BY_ID = """
-        SELECT id, login, password_hash, full_name
+        SELECT id, login, password_hash, full_name, role
         FROM app_user
         WHERE id = :id
         """;
 
     private static final String SQL_FIND_BY_LOGIN = """
-        SELECT id, login, password_hash, full_name
+        SELECT id, login, password_hash, full_name, role
         FROM app_user
         WHERE login = :login
         """;
@@ -47,7 +47,8 @@ public class JdbcUserRepository implements UserRepository {
         SqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue("login", user.login(), Types.VARCHAR)
                 .addValue("passwordHash", user.passwordHash(), Types.VARCHAR)
-                .addValue("fullName", user.fullName(), Types.VARCHAR);
+                .addValue("fullName", user.fullName(), Types.VARCHAR)
+                .addValue("role", user.role().name(), Types.VARCHAR);
 
         try {
             Long id = jdbc.queryForObject(SQL_INSERT, parameterSource, Long.class);
