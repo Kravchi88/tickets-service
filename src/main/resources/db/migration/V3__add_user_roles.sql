@@ -1,0 +1,5 @@
+ALTER TABLE app_user
+    ADD COLUMN role VARCHAR(32) NOT NULL DEFAULT 'ROLE_BUYER';
+
+ALTER TABLE app_user
+    ADD CONSTRAINT app_user_role_check CHECK (role IN ('ROLE_BUYER', 'ROLE_ADMIN'));
