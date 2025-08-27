@@ -1,0 +1,2098 @@
+{
+	"info": {
+		"_postman_id": "1be2b2ca-89a7-40a4-99d4-1e0a491e6037",
+		"name": "Tickets Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39614481"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Register - success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 201 Created\", () => {",
+									"  pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has id/login/fullName\", () => {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json).to.have.property(\"id\");",
+									"  pm.expect(json).to.have.property(\"login\", pm.collectionVariables.get(\"login\"));",
+									"  pm.expect(json).to.have.property(\"fullName\", pm.collectionVariables.get(\"fullName\"));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"{{login}}\",\n    \"password\": \"{{password}}\",\n    \"fullName\": \"{{fullName}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register - duplicate login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 409 Conflict\", () => {",
+									"  pm.response.to.have.status(409);",
+									"});",
+									"",
+									"pm.test(\"Error payload matches format\", () => {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json).to.have.property(\"error\", \"CONFLICT\");",
+									"  pm.expect(json).to.have.property(\"message\", \"Duplicate login\");",
+									"  pm.expect(json).to.have.property(\"issues\");",
+									"  pm.expect(json.issues).to.have.property(\"login\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"{{login}}\",\n    \"password\": \"An0therPass\",\n    \"fullName\": \"Another Name\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register - login too short",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 400 Bad Request\", () => {",
+									"  pm.response.to.have.status(400);",
+									"});",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Error type is VALIDATION_ERROR\", () => {",
+									"  pm.expect(json).to.have.property(\"error\", \"VALIDATION_ERROR\");",
+									"  pm.expect(json).to.have.property(\"issues\");",
+									"});",
+									"",
+									"pm.test(\"Login has size error\", () => {",
+									"  pm.expect(json.issues).to.have.property(\"login\");",
+									"  pm.expect(json.issues.login).to.include(\"login length must be from 3 to 255\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"ab\",\n    \"password\": \"abc12345\",\n    \"fullName\": \"John Doe\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register - login contains space",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 400 Bad Request\", () => {",
+									"  pm.response.to.have.status(400);",
+									"});",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Error type is VALIDATION_ERROR\", () => {",
+									"  pm.expect(json).to.have.property(\"error\", \"VALIDATION_ERROR\");",
+									"  pm.expect(json).to.have.property(\"issues\");",
+									"});",
+									"",
+									"pm.test(\"Login has pattern error\", () => {",
+									"  pm.expect(json.issues).to.have.property(\"login\");",
+									"  pm.expect(json.issues.login).to.include(",
+									"    \"login must contain only latin letters, digits and underscores. Minimum one letter\"",
+									"  );",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"ab cd\",\n    \"password\": \"abc12345\",\n    \"fullName\": \"John Doe\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register - password empty",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 400 Bad Request\", () => {",
+									"  pm.response.to.have.status(400);",
+									"});",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Error type is VALIDATION_ERROR\", () => {",
+									"  pm.expect(json).to.have.property(\"error\", \"VALIDATION_ERROR\");",
+									"  pm.expect(json).to.have.property(\"issues\");",
+									"});",
+									"",
+									"pm.test(\"Password has absence error\", () => {",
+									"  pm.expect(json.issues).to.have.property(\"password\");",
+									"  pm.expect(json.issues.password).to.include(\"password is required\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"validuser\",\n    \"password\": \"\",\n    \"fullName\": \"John Doe\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register - multiple field errors",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 400 Bad Request\", () => {",
+									"  pm.response.to.have.status(400);",
+									"});",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Type is VALIDATION_ERROR with issues map\", () => {",
+									"  pm.expect(json).to.have.property(\"error\", \"VALIDATION_ERROR\");",
+									"  pm.expect(json).to.have.property(\"issues\");",
+									"  pm.expect(json.issues).to.be.an(\"object\");",
+									"});",
+									"",
+									"pm.test(\"Login has at least absence error\", () => {",
+									"  pm.expect(json.issues).to.have.property(\"login\");",
+									"  pm.expect(json.issues.login).to.be.an(\"array\");",
+									"  pm.expect(json.issues.login).to.include(\"login is required\");",
+									"});",
+									"",
+									"pm.test(\"Password has pattern error\", () => {",
+									"  pm.expect(json.issues).to.have.property(\"password\");",
+									"  pm.expect(json.issues.password).to.be.an(\"array\");",
+									"  pm.expect(json.issues.password).to.include(",
+									"    \"password must contain only latin letters and digits. Minimum one letter and one digit\"",
+									"  );",
+									"});",
+									"",
+									"pm.test(\"fullName has pattern error\", () => {",
+									"  pm.expect(json.issues).to.have.property(\"fullName\");",
+									"  pm.expect(json.issues.fullName).to.be.an(\"array\");",
+									"  pm.expect(json.issues.fullName).to.include(",
+									"    \"full name must contain only latin letters and spaces. Only one space in a row and between letters\"",
+									"  );",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"\",\n    \"password\": \"12345678\",\n    \"fullName\": \"John  Doe\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ticket",
+			"item": [
+				{
+					"name": "Available, exact cities - success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+									"",
+									"const json = pm.response.json();",
+									"pm.test(\"Has paging fields\", () => {",
+									"  pm.expect(json).to.have.property(\"items\");",
+									"  pm.expect(json).to.have.property(\"page\", 0);",
+									"  pm.expect(json).to.have.property(\"size\", 10); // default",
+									"  pm.expect(json).to.have.property(\"hasNext\", false);",
+									"});",
+									"",
+									"pm.test(\"Exactly 4 items\", () => pm.expect(json.items.length).to.eql(4));",
+									"",
+									"pm.test(\"All items have origin~London and destination~Dubai\", () => {",
+									"  json.items.forEach(it => {",
+									"    pm.expect(it.origin.toLowerCase()).to.include(\"don\");",
+									"    pm.expect(it.destination.toLowerCase()).to.include(\"dub\");",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/available?origin=don&destination=dub",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"available"
+							],
+							"query": [
+								{
+									"key": "origin",
+									"value": "don"
+								},
+								{
+									"key": "destination",
+									"value": "dub"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Available, carrier dest - success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"2 items, no pagination next\", () => {",
+									"  pm.expect(json.items.length).to.eql(2);",
+									"  pm.expect(json.hasNext).to.eql(false);",
+									"});",
+									"",
+									"pm.test(\"All items carrier~Emirates and destination~Singapore\", () => {",
+									"  json.items.forEach(it => {",
+									"    pm.expect(it.carrier.toLowerCase()).to.include(\"emir\");",
+									"    pm.expect(it.destination.toLowerCase()).to.include(\"sing\");",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/available?carrier=emir&destination=sing",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"available"
+							],
+							"query": [
+								{
+									"key": "carrier",
+									"value": "emir"
+								},
+								{
+									"key": "destination",
+									"value": "sing"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Available, exact time - success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+									"const json = pm.response.json();",
+									"",
+									"const from = new Date(\"2025-10-01T00:00:00Z\").getTime();",
+									"const to   = new Date(\"2025-10-03T00:00:00Z\").getTime();",
+									"",
+									"pm.test(\"Exactly 3 items in window\", () => pm.expect(json.items.length).to.eql(3));",
+									"",
+									"pm.test(\"Each item within [from,to]\", () => {",
+									"  json.items.forEach(it => {",
+									"    const t = new Date(it.departureTs).getTime();",
+									"    pm.expect(t >= from, `>= fromTime`).to.be.true;",
+									"    pm.expect(t <= to,   `<= toTime`).to.be.true;",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/available?fromTime=2025-10-01T00:00:00Z&toTime=2025-10-03T00:00:00Z",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"available"
+							],
+							"query": [
+								{
+									"key": "fromTime",
+									"value": "2025-10-01T00:00:00Z"
+								},
+								{
+									"key": "toTime",
+									"value": "2025-10-03T00:00:00Z"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Available, pagination - success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"2 items and hasNext=true\", () => {",
+									"  pm.expect(json.items.length).to.eql(2);",
+									"  pm.expect(json.page).to.eql(0);",
+									"  pm.expect(json.size).to.eql(2);",
+									"  pm.expect(json.hasNext).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"All items origin=Singapore\", () => {",
+									"  json.items.forEach(it => pm.expect(it.origin).to.eql(\"Singapore\"));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/available?origin=singapore&page=0&size=2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"available"
+							],
+							"query": [
+								{
+									"key": "origin",
+									"value": "singapore"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Available, all params - success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", () => {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const body = pm.response.json();",
+									"",
+									"pm.test(\"PageResponse shape\", () => {",
+									"  pm.expect(body).to.have.property(\"items\").that.is.an(\"array\");",
+									"  pm.expect(body).to.have.property(\"page\", 0);",
+									"  pm.expect(body).to.have.property(\"size\", 10);",
+									"  pm.expect(body).to.have.property(\"hasNext\", false);",
+									"});",
+									"",
+									"pm.test(\"Exactly 2 tickets returned\", () => {",
+									"  pm.expect(body.items.length).to.eql(2);",
+									"});",
+									"",
+									"pm.test(\"Sorted by departureTs ASC\", () => {",
+									"  const ts = body.items.map(i => i.departureTs);",
+									"  const sorted = [...ts].sort();",
+									"  pm.expect(ts).to.eql(sorted);",
+									"});",
+									"",
+									"function bySeat(seat) {",
+									"  return body.items.find(i => i.seatNumber === seat);",
+									"}",
+									"",
+									"const t1 = bySeat(\"20A\");",
+									"const t2 = bySeat(\"20B\");",
+									"",
+									"pm.test(\"Both expected seats present\", () => {",
+									"  pm.expect(t1, \"ticket with seat 20A\").to.be.an(\"object\");",
+									"  pm.expect(t2, \"ticket with seat 20B\").to.be.an(\"object\");",
+									"});",
+									"",
+									"function commonChecks(t) {",
+									"  pm.expect(t).to.have.property(\"origin\", \"Dallas\");",
+									"  pm.expect(t).to.have.property(\"destination\", \"Miami\");",
+									"  pm.expect(t).to.have.property(\"carrier\", \"American Airlines\");",
+									"  pm.expect(t).to.have.property(\"durationMinutes\", 180);",
+									"  pm.expect(t).to.have.property(\"id\").that.is.a(\"number\");",
+									"  pm.expect(t).to.have.property(\"price\").that.is.a(\"number\");",
+									"  pm.expect(t).to.have.property(\"departureTs\").that.is.a(\"string\");",
+									"}",
+									"",
+									"pm.test(\"Common fields OK\", () => {",
+									"  commonChecks(t1);",
+									"  commonChecks(t2);",
+									"});",
+									"",
+									"pm.test(\"Exact instants + prices\", () => {",
+									"  const exp1 = \"2025-09-05T09:30:00-05:00\";",
+									"  const exp2 = \"2025-09-06T09:30:00-05:00\";",
+									"",
+									"  pm.expect(new Date(t1.departureTs).getTime()).to.eql(new Date(exp1).getTime());",
+									"  pm.expect(new Date(t2.departureTs).getTime()).to.eql(new Date(exp2).getTime());",
+									"",
+									"  pm.expect(t1.price).to.eql(12000);",
+									"  pm.expect(t2.price).to.eql(12500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/available?origin=Dal&destination=Mia&carrier=Amer&page=0&size=10&fromTime=2025-09-01T00:00:00-05:00&toTime=2025-09-10T23:59:59-05:00",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"available"
+							],
+							"query": [
+								{
+									"key": "origin",
+									"value": "Dal"
+								},
+								{
+									"key": "destination",
+									"value": "Mia"
+								},
+								{
+									"key": "carrier",
+									"value": "Amer"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "fromTime",
+									"value": "2025-09-01T00:00:00-05:00"
+								},
+								{
+									"key": "toTime",
+									"value": "2025-09-10T23:59:59-05:00"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Available - invalid pagination",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+									"",
+									"const json = pm.response.json();",
+									"pm.test(\"Error code & shape\", () => {",
+									"  pm.expect(json.error).to.eql(\"VALIDATION_ERROR\");",
+									"  pm.expect(json).to.have.property(\"issues\");",
+									"  pm.expect(json.issues).to.have.property(\"params\");",
+									"});",
+									"",
+									"pm.test(\"Contains both page & size violations\", () => {",
+									"  const msgs = json.issues.params.join(\" | \").toLowerCase();",
+									"  pm.expect(msgs).to.include(\"greater than or equal to 0\"); // page",
+									"  pm.expect(msgs).to.include(\"greater than or equal to 1\"); // size",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/available?page=-1&size=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"available"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "-1"
+								},
+								{
+									"key": "size",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Available - invalid date",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+									"",
+									"const json = pm.response.json();",
+									"pm.test(\"Type mismatch handled\", () => {",
+									"  pm.expect(json.error).to.eql(\"VALIDATION_ERROR\");",
+									"  pm.expect(json.issues).to.have.property(\"params\");",
+									"",
+									"  const msgs = json.issues.params.map(s => s.toLowerCase());",
+									"  pm.expect(msgs.some(m => m.includes(\"invalid value for parameter 'fromtime'\"))).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/available?fromTime=not-a-date",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"available"
+							],
+							"query": [
+								{
+									"key": "fromTime",
+									"value": "not-a-date"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Available - date in past",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+									"",
+									"const json = pm.response.json();",
+									"pm.test(\"Constraint violation (FutureOrPresent)\", () => {",
+									"  pm.expect(json.error).to.eql(\"VALIDATION_ERROR\");",
+									"  pm.expect(json.issues).to.have.property(\"params\");",
+									"  const msgs = json.issues.params.join(\" | \").toLowerCase();",
+									"",
+									"  pm.expect(msgs).to.include(\"present or in the future\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/available?toTime=2000-01-01T00:00:00Z",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"available"
+							],
+							"query": [
+								{
+									"key": "toTime",
+									"value": "2000-01-01T00:00:00Z"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Available - toTime before fromTime",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+									"",
+									"const json = pm.response.json();",
+									"pm.test(\"IllegalArgumentException handled\", () => {",
+									"  pm.expect(json.error).to.eql(\"VALIDATION_ERROR\");",
+									"  pm.expect(json.issues).to.have.property(\"params\");",
+									"  pm.expect(json.issues.params).to.include(\"Invalid date filter. fromTime must be before or equal to toTime\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/available?fromTime=2030-01-02T00:00:00Z&toTime=2030-01-01T00:00:00Z",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"available"
+							],
+							"query": [
+								{
+									"key": "fromTime",
+									"value": "2030-01-02T00:00:00Z"
+								},
+								{
+									"key": "toTime",
+									"value": "2030-01-01T00:00:00Z"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Purchase",
+			"item": [
+				{
+					"name": "Buy ticket - success",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const suffix = Date.now();",
+									"const user = {",
+									"  login: `buyer_${suffix}`,",
+									"  password: \"Passw0rd1\",",
+									"  fullName: \"Buyer Auto\"",
+									"};",
+									"",
+									"pm.sendRequest({",
+									"  url: pm.collectionVariables.get(\"baseUrl\") + \"/api/users/register\",",
+									"  method: \"POST\",",
+									"  header: {",
+									"    \"Content-Type\": \"application/json\",",
+									"    \"Accept\": \"application/json\"",
+									"  },",
+									"  body: {",
+									"    mode: \"raw\",",
+									"    raw: JSON.stringify(user)",
+									"  }",
+									"}, (err, res) => {",
+									"  if (err) {",
+									"    throw new Error(\"Pre-request user registration failed: \" + err);",
+									"  }",
+									"  if (!res || res.code !== 201) {",
+									"    throw new Error(\"Unexpected status at registration: \" + (res && res.code));",
+									"  }",
+									"  const json = res.json();",
+									"  if (!json || !json.id) {",
+									"    throw new Error(\"No user id returned from registration\");",
+									"  }",
+									"  pm.collectionVariables.set(\"buyerId\", String(json.id));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"201 Created\", () => pm.response.code === 201);",
+									"",
+									"pm.test(\"Location header points to purchase resource\", () => {",
+									"  const loc = pm.response.headers.get(\"Location\");",
+									"  pm.expect(loc).to.match(/^\\/api\\/purchases\\/\\d+$/);",
+									"});",
+									"",
+									"const body = pm.response.json();",
+									"",
+									"pm.test(\"Body has purchaseId and ticket\", () => {",
+									"  pm.expect(body).to.have.property(\"purchaseId\");",
+									"  pm.expect(body).to.have.property(\"ticket\");",
+									"});",
+									"",
+									"pm.test(\"Ticket details are correct\", () => {",
+									"  pm.expect(body.ticket).to.include({",
+									"    id: Number(pm.collectionVariables.get(\"ticketIdToBuy\")),",
+									"    origin: \"Dallas\",",
+									"    destination: \"Miami\",",
+									"    carrier: \"American Airlines\",",
+									"    durationMinutes: 180,",
+									"    seatNumber: \"20A\"",
+									"  });",
+									"  ",
+									"  pm.expect(body.ticket.departureTs).to.eql(\"2025-09-05T14:30:00Z\");",
+									"});",
+									"",
+									"pm.test(\"Purchase price and ts\", () => {",
+									"  pm.expect(body.purchasePrice).to.eql(12000);",
+									"  pm.expect(body.purchaseTs).to.be.a(\"string\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{buyerId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/{{ticketIdToBuy}}/purchase",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"{{ticketIdToBuy}}",
+								"purchase"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buy ticket - already purchased",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const suffix = Date.now();",
+									"const user = { login: `buyer_${suffix}`, password: \"Passw0rd1\", fullName: \"Buyer Auto\" };",
+									"",
+									"",
+									"pm.sendRequest({",
+									"  url: pm.collectionVariables.get(\"baseUrl\") + \"/api/users/register\",",
+									"  method: \"POST\",",
+									"  header: { \"Content-Type\": \"application/json\", \"Accept\": \"application/json\" },",
+									"  body: { mode: \"raw\", raw: JSON.stringify(user) }",
+									"}, (err, res) => {",
+									"  if (err) throw new Error(\"Registration failed: \" + err);",
+									"  pm.expect(res.code).to.eql(201);",
+									"  const j = res.json();",
+									"  pm.collectionVariables.set(\"buyerId\", String(j.id));",
+									"",
+									"  pm.sendRequest({",
+									"    url: pm.collectionVariables.get(\"baseUrl\") + `/api/tickets/` + pm.collectionVariables.get(\"ticketIdAlreadyPurchased\") + `/purchase`,",
+									"    method: \"POST\",",
+									"    header: { \"Accept\": \"application/json\", \"X-User-Id\": String(j.id) }",
+									"  }, (err2, res2) => {",
+									"    if (err2) throw new Error(\"First purchase failed: \" + err2);",
+									"    pm.expect(res2.code).to.eql(201);",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+									"const body = pm.response.json();",
+									"pm.test(\"Error is CONFLICT / already purchased\", () => {",
+									"  pm.expect(body.error).to.eql(\"CONFLICT\");",
+									"  pm.expect(body.message).to.eql(\"Ticket already purchased\");",
+									"  pm.expect(body.issues.ticket[0]).to.include(\"already purchased\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{buyerId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/{{ticketIdAlreadyPurchased}}/purchase",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"{{ticketIdAlreadyPurchased}}",
+								"purchase"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buy ticket - ticket not found",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const suffix = Date.now();",
+									"const user = { login: `buyer_${suffix}`, password: \"Passw0rd1\", fullName: \"Buyer Auto\" };",
+									"",
+									"pm.sendRequest({",
+									"  url: pm.collectionVariables.get(\"baseUrl\") + \"/api/users/register\",",
+									"  method: \"POST\",",
+									"  header: { \"Content-Type\": \"application/json\", \"Accept\": \"application/json\" },",
+									"  body: { mode: \"raw\", raw: JSON.stringify(user) }",
+									"}, (err, res) => {",
+									"  if (err) throw new Error(\"Registration failed: \" + err);",
+									"  pm.expect(res.code).to.eql(201);",
+									"  const j = res.json();",
+									"  pm.collectionVariables.set(\"buyerId\", String(j.id));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+									"const body = pm.response.json();",
+									"pm.test(\"Error shape\", () => {",
+									"  pm.expect(body).to.have.property(\"error\", \"NOT FOUND\");",
+									"  pm.expect(body).to.have.property(\"message\", \"Ticket not found\");",
+									"  pm.expect(body.issues).to.have.property(\"ticket\");",
+									"  pm.expect(body.issues.ticket[0]).to.include(\"not found\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{buyerId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/999999/purchase",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"999999",
+								"purchase"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buy ticket - user not found",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"absentUserId\", \"999999\");",
+									"",
+									"pm.sendRequest({",
+									"  url: pm.collectionVariables.get(\"baseUrl\") + \"/api/tickets/available?page=0&size=1\",",
+									"  method: \"GET\",",
+									"  header: { \"Accept\": \"application/json\" }",
+									"}, (err, res) => {",
+									"  if (err) throw new Error(\"Fetch available failed: \" + err);",
+									"  pm.expect(res.code).to.eql(200);",
+									"  const j = res.json();",
+									"  pm.expect(j.items.length).to.be.above(0);",
+									"  const id = j.items[0].id;",
+									"  pm.collectionVariables.set(\"ticketId\", String(id));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+									"const body = pm.response.json();",
+									"pm.test(\"Error is NOT FOUND / user not found\", () => {",
+									"  pm.expect(body.error).to.eql(\"NOT FOUND\");",
+									"  pm.expect(body.message).to.eql(\"User not found\");",
+									"  pm.expect(body.issues.user[0]).to.include(\"not found\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{absentUserId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/{{ticketId}}/purchase",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"{{ticketId}}",
+								"purchase"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User's purchases - success",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const baseUrl = pm.collectionVariables.get(\"baseUrl\");",
+									"",
+									"const suffix = Date.now();",
+									"const user = {",
+									"  login: `buyer_${suffix}`,",
+									"  password: \"Passw0rd1\",",
+									"  fullName: \"Buyer Auto\"",
+									"};",
+									"",
+									"const ticketsToBuy = [15, 16, 13];",
+									"",
+									"function registerUser(cb) {",
+									"  pm.sendRequest({",
+									"    url: baseUrl + \"/api/users/register\",",
+									"    method: \"POST\",",
+									"    header: { \"Content-Type\": \"application/json\", \"Accept\": \"application/json\" },",
+									"    body: { mode: \"raw\", raw: JSON.stringify(user) }",
+									"  }, (err, res) => {",
+									"    if (err) return cb(err);",
+									"    if (res.code !== 201) return cb(new Error(\"Unexpected registration status: \" + res.code));",
+									"    const json = res.json();",
+									"    if (!json || !json.id) return cb(new Error(\"Registration returned no id\"));",
+									"    pm.collectionVariables.set(\"buyerId\", String(json.id));",
+									"    cb(null, json.id);",
+									"  });",
+									"}",
+									"",
+									"function purchaseTicket(userId, ticketId, cb) {",
+									"  pm.sendRequest({",
+									"    url: `${baseUrl}/api/tickets/${ticketId}/purchase`,",
+									"    method: \"POST\",",
+									"    header: {",
+									"      \"X-User-Id\": String(userId),",
+									"      \"Accept\": \"application/json\"",
+									"    }",
+									"  }, (err, res) => {",
+									"    if (err) return cb(err);",
+									"    if (res.code !== 201) return cb(new Error(`Purchase ${ticketId} unexpected status: ` + res.code));",
+									"    cb(null);",
+									"  });",
+									"}",
+									"",
+									"registerUser((e, uid) => {",
+									"  if (e) throw e;",
+									"  purchaseTicket(uid, ticketsToBuy[0], (e1) => {",
+									"    if (e1) throw e1;",
+									"    purchaseTicket(uid, ticketsToBuy[1], (e2) => {",
+									"      if (e2) throw e2;",
+									"      purchaseTicket(uid, ticketsToBuy[2], (e3) => {",
+									"        if (e3) throw e3;",
+									"      });",
+									"    });",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP 200\", () => {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const body = pm.response.json();",
+									"pm.test(\"Response has PageResponse shape\", () => {",
+									"  pm.expect(body).to.have.property(\"items\").that.is.an(\"array\");",
+									"  pm.expect(body).to.have.property(\"page\");",
+									"  pm.expect(body).to.have.property(\"size\");",
+									"  pm.expect(body).to.have.property(\"hasNext\");",
+									"});",
+									"",
+									"const items = body.items;",
+									"pm.test(\"At least 3 purchases returned\", () => {",
+									"  pm.expect(items.length).to.be.at.least(3);",
+									"});",
+									"",
+									"const byId = {};",
+									"for (const it of items) {",
+									"  if (it && it.ticket) byId[it.ticket.id] = it;",
+									"}",
+									"",
+									"const expected = [",
+									"  { id: 15, origin: \"Dallas\",   destination: \"Miami\",  carrier: \"American Airlines\", seat: \"20A\", price: 12000, ts: \"2025-09-05T14:30:00Z\", duration: 180 },",
+									"  { id: 16, origin: \"Dallas\",   destination: \"Miami\",  carrier: \"American Airlines\", seat: \"20B\", price: 12500, ts: \"2025-09-06T14:30:00Z\", duration: 180 },",
+									"  { id: 13, origin: \"New York\", destination: \"London\", carrier: \"American Airlines\", seat: \"7A\",  price: 41000, ts: \"2025-10-20T16:00:00Z\", duration: 420 }",
+									"];",
+									"",
+									"for (const exp of expected) {",
+									"  pm.test(`Contains purchase for ticket #${exp.id}`, () => {",
+									"    const p = byId[exp.id];",
+									"    pm.expect(p, `ticket ${exp.id} not found in purchases`).to.exist;",
+									"",
+									"    pm.expect(p.ticket).to.include({",
+									"      id: exp.id,",
+									"      origin: exp.origin,",
+									"      destination: exp.destination,",
+									"      carrier: exp.carrier,",
+									"      durationMinutes: exp.duration",
+									"    });",
+									"    pm.expect(p.ticket.seatNumber).to.eql(exp.seat);",
+									"    pm.expect(p.ticket.departureTs).to.eql(exp.ts);",
+									"",
+									"    pm.expect(p.ticket).to.not.have.property(\"price\");",
+									"",
+									"    pm.expect(p.purchasePrice).to.eql(exp.price);",
+									"    pm.expect(p.purchaseTs).to.be.a(\"string\");",
+									"  });",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{buyerId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/purchases",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"purchases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User's purchases - success empty",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const baseUrl = pm.collectionVariables.get(\"baseUrl\");",
+									"",
+									"const suffix = Date.now();",
+									"const user = { login: `buyer_empty_${suffix}`, password: \"Passw0rd1\", fullName: \"Buyer Empty\" };",
+									"",
+									"pm.sendRequest({",
+									"  url: baseUrl + \"/api/users/register\",",
+									"  method: \"POST\",",
+									"  header: { \"Content-Type\": \"application/json\", \"Accept\": \"application/json\" },",
+									"  body: { mode: \"raw\", raw: JSON.stringify(user) }",
+									"}, (err, res) => {",
+									"  if (err) throw err;",
+									"  if (res.code !== 201) throw new Error(\"Unexpected registration status: \" + res.code);",
+									"  const json = res.json();",
+									"  if (!json || !json.id) throw new Error(\"Registration returned no id\");",
+									"  pm.collectionVariables.set(\"buyerId\", String(json.id));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"HTTP 200\", () => {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const body = pm.response.json();",
+									"",
+									"pm.test(\"Has PageResponse shape\", () => {",
+									"  pm.expect(body).to.have.property(\"items\").that.is.an(\"array\");",
+									"  pm.expect(body).to.have.property(\"page\");",
+									"  pm.expect(body).to.have.property(\"size\");",
+									"  pm.expect(body).to.have.property(\"hasNext\");",
+									"});",
+									"",
+									"pm.test(\"No purchases for a new user\", () => {",
+									"  pm.expect(body.items.length).to.eql(0);",
+									"  pm.expect(body.hasNext).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{buyerId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/purchases",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"purchases"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authorization",
+			"item": [
+				{
+					"name": "login - success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test(\"Has access & refresh\", () => {",
+									"  pm.expect(body).to.have.property(\"accessToken\").that.is.a(\"string\");",
+									"  pm.expect(body).to.have.property(\"refreshToken\").that.is.a(\"string\");",
+									"});",
+									"pm.collectionVariables.set(\"accessToken\", body.accessToken);",
+									"pm.collectionVariables.set(\"refreshToken\", body.refreshToken);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"packages": {},
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"{{login}}\",\n  \"password\": \"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/authorization/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"authorization",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "has access",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 with access token\", () => pm.response.to.have.status(200));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/purchases",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"purchases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "access denied",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 401 Unauthorized\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Error response structure is correct\", function () {",
+									"    const body = pm.response.json();",
+									"",
+									"    pm.expect(body).to.have.property(\"error\", \"UNAUTHORIZED\");",
+									"    pm.expect(body).to.have.property(\"message\", \"Authentication required\");",
+									"    pm.expect(body).to.have.property(\"issues\");",
+									"    pm.expect(body.issues).to.have.property(\"authentication\");",
+									"",
+									"    pm.expect(body.issues.authentication).to.include(\"Missing or invalid access token\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/purchases",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"purchases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "no auth required",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 with access token\", () => pm.response.to.have.status(200));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tickets/available",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"available"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh - success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains access and refresh tokens\", function () {",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"accessToken\");",
+									"    pm.expect(body).to.have.property(\"refreshToken\");",
+									"    pm.expect(body).to.have.property(\"tokenType\", \"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Access token is not empty\", function () {",
+									"    const body = pm.response.json();",
+									"    pm.expect(body.accessToken).to.be.a(\"string\").and.not.empty;",
+									"});",
+									"",
+									"pm.test(\"Refresh token is the same as before\", function () {",
+									"    const body = pm.response.json();",
+									"    pm.expect(body.refreshToken).to.eql(pm.collectionVariables.get(\"refreshToken\"));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/authorization/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"authorization",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"const suffix = Date.now();",
+							"const login = `jwtuser${suffix}`;",
+							"const password = `Pwd${suffix}`;",
+							"",
+							"pm.collectionVariables.set(\"login\", login);",
+							"pm.collectionVariables.set(\"password\", password);",
+							"",
+							"pm.sendRequest({",
+							"  url: pm.collectionVariables.get(\"baseUrl\") + \"/api/users/register\",",
+							"  method: \"POST\",",
+							"  header: {",
+							"    \"Content-Type\": \"application/json\",",
+							"    \"Accept\": \"application/json\"",
+							"  },",
+							"  body: {",
+							"    mode: \"raw\",",
+							"    raw: JSON.stringify({",
+							"      login: login,",
+							"      password: password,",
+							"      fullName: \"JWT Tester\"",
+							"    })",
+							"  }",
+							"}, (err, res) => {",
+							"  if (err) throw new Error(\"Pre-request registration failed: \" + err);",
+							"  if (!res || res.code !== 201) throw new Error(\"Registration unexpected status: \" + (res && res.code));",
+							"  const json = res.json();",
+							"  if (!json || !json.id) throw new Error(\"No user id returned from registration\");",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "New Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Admin can delete\", () => pm.response.to.have.status(204));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_access}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/carriers/{{carrierId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"carriers",
+								"{{carrierId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Buyer forbidden\", () => pm.response.to.have.status(403));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{buyer_access}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/carriers/{{carrierId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"carriers",
+								"{{carrierId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"const base = pm.collectionVariables.get(\"baseUrl\");",
+							"",
+							"function registerBuyer(login, password, fullName, cb) {",
+							"  pm.sendRequest({",
+							"    url: `${base}/api/users/register`,",
+							"    method: \"POST\",",
+							"    header: { \"Content-Type\": \"application/json\" },",
+							"    body: {",
+							"      mode: \"raw\",",
+							"      raw: JSON.stringify({",
+							"        login: login,",
+							"        password: password,",
+							"        fullName: fullName,",
+							"        role: \"ROLE_BUYER\"",
+							"      })",
+							"    }",
+							"  }, (err, res) => {",
+							"    if (err) { console.log(\"register error:\", err); return cb && cb(err); }",
+							"    if (res.code !== 201 && res.code !== 409) {",
+							"      console.log(\"register unexpected code:\", res.code, res.text());",
+							"      return cb && cb(new Error(\"register failed\"));",
+							"    }",
+							"    cb && cb();",
+							"  });",
+							"}",
+							"",
+							"function loginUser(login, password, tokenVar, cb) {",
+							"  pm.sendRequest({",
+							"    url: `${base}/api/authorization/login`,",
+							"    method: \"POST\",",
+							"    header: { \"Content-Type\": \"application/json\" },",
+							"    body: { mode: \"raw\", raw: JSON.stringify({ login, password }) }",
+							"  }, (err, res) => {",
+							"    if (err) { console.log(\"login error:\", login, err); return cb && cb(err); }",
+							"    if (res.code !== 200) { ",
+							"      console.log(\"login failed:\", login, res.code, res.text()); ",
+							"      return cb && cb(new Error(\"login failed\")); ",
+							"    }",
+							"    const json = res.json();",
+							"    pm.collectionVariables.set(tokenVar, json.accessToken);",
+							"    cb && cb();",
+							"  });",
+							"}",
+							"",
+							"registerBuyer(\"buyer\", \"BuyerPassw0rd\", \"John Buyer\", () => {",
+							"  loginUser(\"buyer\", \"BuyerPassw0rd\", \"buyer_access\", () => {",
+							"    loginUser(\"admin\", \"Adm1nPassw0rd\", \"admin_access\", () => {",
+							"    });",
+							"  });",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "login",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "fullName",
+			"value": "Ilya Kravchenko",
+			"type": "string"
+		},
+		{
+			"key": "ticketIdToBuy",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "buyerId",
+			"value": ""
+		},
+		{
+			"key": "ticketIdAlreadyPurchased",
+			"value": "16",
+			"type": "string"
+		},
+		{
+			"key": "absentUserId",
+			"value": ""
+		},
+		{
+			"key": "ticketId",
+			"value": ""
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "carrierId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "buyer_access",
+			"value": ""
+		},
+		{
+			"key": "admin_access",
+			"value": ""
+		}
+	]
+}
